@@ -1,0 +1,68 @@
+---
+# Author: uzzal
+# Email: uzzal2k5@gmail.com
+# Disclaimer: Any user / Sys Admin can rewrite or distribute this maintaining GNU policy
+  - hosts: nginx
+    remote_user: root
+
+    tasks:
+      - name: upgrade os
+        yum: 
+          name: git
+          state: latest
+          update_cache: yes
+      - name: Install nginx using yum local rpm or remote rpm and or epel-release 
+        yum:
+          # Nginx Install from sibple yum
+          #name: nginx
+          #state: latest
+          
+          # Install nginx from epel-release
+          #name: epel-release
+          #state: latest
+          #name: nginx
+          #state: latest
+          
+          # install nginx rpm from a local file
+          #name: /usr/local/src/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+          #state: present
+
+          # Nginx Install using Remore repo
+          name: http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+          state: present
+          name: nginx
+          state: present
+          update_cache: yes
+        
+      - name: nginx starting
+        service:
+          name: nginx
+          state: started
+
+      #- name: Upload Deafult Index for hosts
+      - copy: 
+          src: /home/shafiq/Desktop/scripts/nginx/index.html
+          dest: /usr/share/nginx/html/
+          mode: 0644
+      # Firewall Setting
+    
+      - name: firewalld enabled
+        firewalld:
+          service: https
+          #service: "{{item.service}}"
+          permanent: true
+          state: enabled
+          #with_items:
+          #  - { service: http }
+          #  - { service: https }
+          #  - { service: dns }          
+          service: http
+          permanent: true
+          state: enabled
+        notify:     Reload firewalld
+      - name: Reload firewalld
+        command: firewall-cmd --reload
+         
+
+
+     
